@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scaffold.fullname" . }}-backend
+  labels:
+    tags.datadoghq.com/env: {{ .Values.environment | lower | quote }}
+    tags.datadoghq.com/service: {{ include "scaffold.fullname" . }}-backend
+    tags.datadoghq.com/version: {{ .Values.backend.image.tag | lower | quote }}
+    app: {{ include "scaffold.fullname" . }}-backend
+    {{- include "scaffold.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "scaffold.fullname" . }}-backend
+  template:
+    metadata:
+      labels:
+        tags.datadoghq.com/env: {{ .Values.environment | lower | quote }}
+        tags.datadoghq.com/service: {{ include "scaffold.fullname" . }}-backend
+        tags.datadoghq.com/version: {{ .Values.backend.image.tag | quote }}
+        app: {{ include "scaffold.fullname" . }}-backend
+        {{- include "scaffold.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "scaffold.fullname" . }}-backend
+      securityContext:
+      {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+          {{- toYaml .Values.backend.securityContext | nindent 12 }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          envFrom:
+            - configMapRef:
+                name: {{ template "scaffold.fullname" . }}-backend-config
+            - secretRef:
+                name: {{ template "scaffold.fullname" . }}-backend-secret
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENTITY_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp-volume
+          command:
+            - gunicorn
+            - -w
+            {{- if eq .Values.environment "local"}}
+            - "1"
+            - --log-level=debug
+            - --reload
+            {{- else}}
+            - "2"
+            - --log-level=info
+            {{- end}}
+            - --threads
+            - "4"
+            - -b
+            - :{{ .Values.backend.port }}
+            - --worker-tmp-dir
+            - "/tmp"
+            - "entrypoint_app:app"
+          ports:
+            - containerPort: {{ .Values.backend.port }}
+          {{- if ne .Values.environment "local"}}
+          readinessProbe:
+            httpGet:
+              path: /healthz/liveness
+              port: {{ .Values.backend.port }}
+            initialDelaySeconds: 20
+            timeoutSeconds: {{ .Values.backend.healthtimeout | default "2" }}
+          livenessProbe:
+            httpGet:
+              path: /healthz/liveness
+              port: {{ .Values.backend.port }}
+            initialDelaySeconds: 30
+            timeoutSeconds: {{ .Values.backend.healthtimeout | default "2" }}
+          {{- end}}
+        {{- with .Values.backend.resources }}
+          resources:
+          { toYaml . | indent 12 }}
+        {{- end }}
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}

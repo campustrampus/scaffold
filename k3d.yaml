@@ -1,0 +1,7 @@
+# k3d configuration file, saved as e.g. /home/me/myk3dcluster.yaml
+apiVersion: k3d.io/v1alpha2
+kind: Simple
+image: rancher/k3s:v1.18.20-k3s1 
+network: k3d
+registries:
+  create: true

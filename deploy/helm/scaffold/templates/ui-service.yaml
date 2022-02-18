@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "scaffold.fullname" $ }}-ui
+  labels:
+    app: {{ include "scaffold.fullname" $ }}-ui
+    {{- include "scaffold.labels" $ | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.ui.port }}
+      targetPort: {{ .Values.ui.port }}
+      protocol: TCP
+      name: {{ .Values.ui.port | quote }}
+  selector:
+    app: {{ include "scaffold.fullname" $ }}-ui

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scaffold.fullname" . }}-ui
+  labels:
+    app: {{ include "scaffold.fullname" . }}-ui
+    {{- include "scaffold.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.ui.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "scaffold.fullname" . }}-ui
+  template:
+    metadata:
+      labels:
+        app: {{ include "scaffold.fullname" . }}-ui
+        {{- include "scaffold.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "scaffold.fullname" . }}-ui
+      securityContext:
+      {{- toYaml .Values.ui.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+          {{- toYaml .Values.ui.securityContext | nindent 12 }}
+          image: "{{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag | default .Chart.AppVersion }}"
+          volumeMounts:
+            - mountPath: /var/run
+              name: run
+            - mountPath: /var/log/nginx
+              name: log
+            - mountPath: /var/cache/nginx
+              name: cache
+          ports:
+            - containerPort: {{ .Values.ui.port }}
+      volumes:
+      - name: run
+        emptyDir: {}
+      - name: log
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}

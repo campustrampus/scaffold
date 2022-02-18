@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "scaffold.fullname" . }}-flower-config
+  labels:
+    app: {{ template "scaffold.fullname" . }}-flower
+    {{- include "scaffold.labels" . | nindent 4 }}
+data:
+  FLOWER_PORT: {{ $.Values.flower.port| quote }}
+  DD_TRACE_ENABLED: {{ .Values.flower.datadog.dd_trace_enabled | quote }}
+  DD_LOGS_INJECTION: {{ .Values.flower.datadog.dd_logs_injection | quote }}
+  DD_PROFILING_ENABLED: {{ .Values.flower.datadog.dd_profiling_enabled | quote }}
+  DD_ENV: {{ .Values.environment | lower | quote }}
+  DD_SERVICE: {{ include "scaffold.fullname" . }}-flower
+  DD_VERSION: {{ .Values.flower.image.tag | quote }}

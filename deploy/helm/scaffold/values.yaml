@@ -1,0 +1,151 @@
+# Default values for scaffold-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+
+environment: ""
+
+datadog:
+  url: datadog.kube-system:8125
+  traceAgentPort: 8126
+  dogStatSDPort: 8125
+  profilerEnabled: "true"
+
+backend:
+  adminUrlScheme: https
+  auth0:
+    audience: ""
+    callbackURL: ""
+    clientID: ""
+    clientSecret: ""
+    domain: ""
+    logoutURL: http://scaffold.localhost:8443
+    scopes: >-
+      openid profile email
+
+  datadog:
+    dd_trace_enabled: true
+    dd_logs_injection: true
+    dd_profiling_enabled: true
+
+  db:
+    seed: false
+    uri: ""
+  
+  domain: ""
+
+  image:
+    repository:
+    pullPolicy: Always #IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: latest
+ 
+  port: "8081"
+ 
+  replicaCount: 1
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext:
+    capabilities:
+      drop:
+        - all
+      add:
+        - NET_BIND_SERVICE
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 999
+   
+  swagger:
+    url: ""
+
+  version: v1
+
+flower:
+  datadog:
+    dd_trace_enabled: true
+    dd_logs_injection: true
+    dd_profiling_enabled: true
+
+  port: '8888'
+  
+  image:
+    repository: mher/flower
+    pullPolicy: Always #IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: latest
+  
+  replicaCount: 1
+  
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext:
+    capabilities:
+      drop:
+        - all
+      add:
+        - NET_BIND_SERVICE
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 999
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+celery:
+  brokerURL: ""
+
+postgresql:
+  enabled: false
+
+rabbitmq:
+  enabled: false
+
+traefik:
+  enabled: false
+
+ui:
+  replicaCount: 1
+  image:
+    repository: 
+    tag: latest
+  port: 3000
+
+  resources: {}
+  
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext:
+    capabilities:
+      drop:
+        - all
+      add:
+        - NET_BIND_SERVICE
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 999

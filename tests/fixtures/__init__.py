@@ -1,0 +1,1 @@
+from .legacy_database_seed import legacy_database_seed

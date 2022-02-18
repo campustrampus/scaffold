@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "scaffold-api"
+version = "0.1.0"
+description = "Scaffold API"
+authors = ["nick <lapierreni@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+boto3 = "^1.17.62"
+botocore = "^1.20.62"
+Flask = "^1.1.2"
+istreamplanet-flask-auth0 = {git = "https://github.com/istreamlabs/flask-auth0.git", branch="master"}
+gunicorn = "^20.1.0"
+Flask-Login = "^0.5.0"
+Flask-Admin = "^1.5.8"
+Flask-SQLAlchemy = "^2.5.1"
+psycopg2-binary = "^2.8.6"
+Flask-Bootstrap = "^3.3.7"
+Authlib = "^0.15.3"
+requests = "^2.25.1"
+pyeapi = "^0.8.4"
+ciscoconfparse = "^1.5.30"
+GitPython = "^3.1.15"
+itsdangerous = "^1.1.0"
+Flask-Migrate = "^3.1.0"
+flask-healthz = "^0.0.2"
+ddtrace = "^0.48.1"
+Jinja2 = "^2.11.3"
+flask-swagger-ui = "^3.36.0"
+safrs = "^2.11.3"
+flask-restful-swagger-2 = "^0.35"
+PyYAML = "^5.4.1"
+celery = {extras = ["redis"], version = "^5.1.0"}
+Faker = "^8.9.1"
+python-jose = "^3.3.0"
+datadog = "^0.42.0"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.8.2"
+yapf = "^0.31.0"
+pytest = "^6.2.3"
+pytest-cov = "^2.11.1"
+pylint-flask-sqlalchemy = "^0.2.0"
+more-itertools = "^8.7.0"
+flask-sqlalchemy-stubs = {git = "https://github.com/ssfdust/flask-sqlalchemy-stubs.git"}
+pytest-httpserver = "^1.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

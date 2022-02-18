@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "scaffold.fullname" $ }}-flower
+  labels:
+    app: {{ include "scaffold.fullname" $ }}-flower
+    {{- include "scaffold.labels" $ | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.flower.port }}
+      targetPort: {{ .Values.flower.port }}
+      protocol: TCP
+      name: {{ .Values.flower.port | quote }}
+  selector:
+    app: {{ include "scaffold.fullname" $ }}-backend
+

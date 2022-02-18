@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "scaffold.fullname" . }}-backend-config
+  labels:
+    app: {{ template "scaffold.fullname" . }}-backend
+    {{- include "scaffold.labels" . | nindent 4 }}
+data:
+  FLASK_ENV: {{ .Values.environment | quote }}
+  ADMIN_URL_SCHEME: {{ .Values.backend.adminUrlScheme | quote }}
+  AUTH0_AUDIENCE: {{ .Values.backend.auth0.audience | quote }}
+  AUTH0_CLIENT_ID: {{ .Values.backend.auth0.clientID | quote }}
+  AUTH0_DOMAIN: {{ .Values.backend.auth0.domain | quote }}
+  AUTH0_CALLBACK_URL: {{ .Values.backend.auth0.callbackURL | quote }}
+  AUTH0_LOGOUT_URL: {{ .Values.backend.auth0.logoutURL | quote }}
+  AUTH0_SCOPES: {{ .Values.backend.auth0.scopes | quote }}
+  SWAGGER_BASE_URL: {{ .Values.backend.swagger.url | quote }}
+  FLASK_SEED_DB: {{ .Values.backend.db.seed | quote }}
+  DD_TRACE_ENABLED: {{ .Values.backend.datadog.dd_trace_enabled | quote }}
+  DD_LOGS_INJECTION: {{ .Values.backend.datadog.dd_logs_injection | quote }}
+  DD_PROFILING_ENABLED: {{ .Values.backend.datadog.dd_profiling_enabled | quote }}
+  DD_ENV: {{ .Values.environment | lower | quote }}
+  DD_SERVICE: {{ include "scaffold.fullname" . }}-backend
+  DD_VERSION: {{ .Values.backend.image.tag | quote }}

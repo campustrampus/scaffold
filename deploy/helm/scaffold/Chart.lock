@@ -1,0 +1,12 @@
+dependencies:
+- name: traefik
+  repository: https://helm.traefik.io/traefik
+  version: 9.17.5
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.9.5
+- name: rabbitmq
+  repository: https://charts.bitnami.com/bitnami
+  version: 8.20.1
+digest: sha256:1b2427d01c5086b6a31b426f97ad9b4c6577a3dcde9dc42f7bfc3d9ff9af1154
+generated: "2021-09-07T17:29:37.192696729-05:00"

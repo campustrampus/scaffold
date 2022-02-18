@@ -1,0 +1,119 @@
+{% extends 'admin/model/create.html' %}
+
+{% block create_form %}
+    <h1>User Create Custom View</h1>
+    {{ render_form(form, return_url, extra(), form_opts) }}
+{% endblock %}
+
+{# ---------------------- Forms -------------------------- #}
+<!-- overriding render_form since we need override render_form and add_modal_window -->
+{% macro render_form(form, cancel_url, extra=None, form_opts=None, action=None, is_modal=False) -%}
+    {% call lib.form_tag(action=action) %}
+        {{ render_form_fields(form, form_opts=form_opts) }}
+        {{ render_form_buttons(cancel_url, extra, is_modal) }}
+        {{ add_modal_window(modal_window_id, modal_label_id) }}
+    {% endcall %}
+{% endmacro %}
+
+<!-- overriding so that the save button opens up modal with generated token instead of submitting -->
+{% macro render_form_buttons(cancel_url, extra=None, is_modal=False) %}
+    <hr>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10 submit-row">
+            <input type="button" class="btn btn-primary" data-toggle="modal" data-target="#fa_modal_window"
+                value="{{ _gettext('Get Token') }}" />
+            {% if cancel_url %}
+            <a href="{{ cancel_url }}" class="btn btn-danger" role="button" {% if is_modal %}data-dismiss="modal"
+                {% endif %}>{{ _gettext('Cancel') }}</a>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+<!-- overriding so we hide the token field but keep its value -->
+{% macro render_field(form, field, kwargs={}, caller=None) %}
+  {% set direct_error = h.is_field_error(field.errors) %}
+  <!-- hide the token field but retain the generated token value -->
+  {% if field.id == "token" %}
+    <input type="hidden" name="token" value="{{ form.token.data }}"/>
+  {% else %}
+    <div class="form-group{{ ' has-error' if direct_error else '' }}">
+        <label for="{{ field.id }}" class="col-md-2 control-label">{{ field.label.text }}
+            {% if h.is_required_form_field(field) %}
+            <strong style="color: red">&#42;</strong>
+            {%- else -%}
+            &nbsp;
+            {%- endif %}
+        </label>
+        <div class="{{ kwargs.get('column_class', 'col-md-10') }}">
+        {% set _dummy = kwargs.setdefault('class', 'form-control') %}
+        {{ field(**kwargs)|safe }}
+        {% if field.description %}
+        <p class="help-block">{{ field.description|safe }}</p>
+        {% endif %}
+        {% if direct_error %}
+            <ul class="help-block input-errors">
+            {% for e in field.errors if e is string %}
+            <li>{{ e }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        </div>
+        {% if caller %}
+        {{ caller(form, field, direct_error, kwargs) }}
+        {% endif %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+<!-- overriding to use our render_field macro, no other changes made here -->
+{% macro render_form_fields(form, form_opts=None) %}
+    {% if form.hidden_tag is defined %}
+        {{ form.hidden_tag() }}
+    {% else %}
+        {% if csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% endif %}
+        {% for f in form if f.widget.input_type == 'hidden' %}
+            {{ f }}
+        {% endfor %}
+    {% endif %}
+
+    {% if form_opts and form_opts.form_rules %}
+        {% for r in form_opts.form_rules %}
+            {{ r(form, form_opts=form_opts) }}
+        {% endfor %}
+    {% else %}
+        {% for f in form if f.widget.input_type != 'hidden' %}
+          {% if form_opts %}
+            {% set kwargs = form_opts.widget_args.get(f.short_name, {}) %}
+          {% else %}
+            {% set kwargs = {} %}
+          {% endif %}
+          {{ render_field(form, f, kwargs) }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{# ---------------------- Modal -------------------------- #}
+<!-- overwriting with custom modal to display the generated token. form will be submitted here -->
+{% macro add_modal_window(modal_window_id='fa_modal_window', modal_label_id='fa_modal_label') %}
+    <!-- Modal -->
+    <div id="fa_modal_window" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Generated Token:</h4>
+                </div>
+                <div class="modal-body">
+                    <p>{{ form.token.data }}</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-default" value="{{ _gettext('Submit') }}">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

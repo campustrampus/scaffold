@@ -1,0 +1,42 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1beta1
+metadata:
+  name: {{ $.Release.Name }}-ingress-backend
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-{{ $.Release.Name }}-cors-header@kubernetescrd
+spec:
+  rules:
+    - host: {{ .Values.backend.domain }}
+      http:
+        paths:
+          - path: /admin
+            pathType: Prefix
+            backend:
+              serviceName: {{ include "scaffold.fullname" $ }}-backend
+              servicePort: {{ .Values.backend.port }}
+          - path: /api/v1
+            pathType: Prefix
+            backend:
+              serviceName: {{ include "scaffold.fullname" $ }}-backend
+              servicePort: {{ .Values.backend.port }}
+          - path: /callback
+            pathType: Prefix
+            backend:
+              serviceName: {{ include "scaffold.fullname" $ }}-backend
+              servicePort: {{ .Values.backend.port }}
+          - path: /login
+            pathType: Prefix
+            backend:
+              serviceName: {{ include "scaffold.fullname" $ }}-backend
+              servicePort: {{ .Values.backend.port }}
+          - path: /logout
+            pathType: Prefix
+            backend:
+              serviceName: {{ include "scaffold.fullname" $ }}-backend
+              servicePort: {{ .Values.backend.port }}
+          - path: /
+            pathType: Prefix
+            backend:
+              serviceName: {{ include "scaffold.fullname" $  }}-ui
+              servicePort: {{ .Values.ui.port }}

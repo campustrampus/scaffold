@@ -1,0 +1,17 @@
+{% extends 'admin/master.html' %} {% import 'bootstrap/wtf.html' as wtf %} {%
+block body %} {{ super() }}
+<div class="row-fluid">
+  <div>
+    <h1>Flask-Admin Dashboard</h1>
+  </div>
+
+  <a class="btn btn-primary" href="/"
+    ><i class="icon-arrow-left icon-white"></i> Back</a
+  >
+</div>
+<div>
+  <a class="btn btn-primary" href="{{ url_for('admin.logout') }}"
+    ><i class="icon-arrow-left icon-white"></i> Log out</a
+  >
+</div>
+{% endblock body %}

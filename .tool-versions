@@ -1,0 +1,8 @@
+kubectl 1.18.2
+helm 3.6.3
+tilt 0.22.0
+nodejs 16.4.2
+poetry 1.1.6
+k3d 4.4.7
+terraform 1.0.4
+sops 3.7.1

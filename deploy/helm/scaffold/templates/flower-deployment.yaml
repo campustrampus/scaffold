@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scaffold.fullname" . }}-flower
+  labels:
+    tags.datadoghq.com/env: {{ .Values.environment | lower | quote }}
+    tags.datadoghq.com/service: {{ include "scaffold.fullname" . }}-flower
+    tags.datadoghq.com/version: {{ .Values.backend.image.tag | lower | quote }}
+    app: {{ include "scaffold.fullname" . }}-flower
+    {{- include "scaffold.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.flower.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "scaffold.fullname" . }}-flower
+  template:
+    metadata:
+      labels:
+        app: {{ include "scaffold.fullname" . }}-flower
+        tags.datadoghq.com/env: {{ .Values.environment | lower | quote }}
+        tags.datadoghq.com/service: {{ include "scaffold.fullname" . }}-flower
+        tags.datadoghq.com/version: {{ .Values.backend.image.tag | quote }}
+        {{- include "scaffold.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "scaffold.fullname" . }}-flower
+      securityContext:
+      {{- toYaml .Values.flower.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+          {{- toYaml .Values.flower.securityContext | nindent 12 }}
+          image: "{{ .Values.flower.image.repository }}:{{ .Values.flower.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.flower.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "scaffold.fullname" . }}-flower-config
+            - secretRef:
+                name: {{ template "scaffold.fullname" . }}-flower-secret
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENTITY_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+          ports:
+            - containerPort: {{ .Values.flower.port }}
+        {{- with .Values.flower.resources }}
+          resources:
+          { toYaml . | indent 12 }}
+        {{- end }}
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
+

@@ -1,0 +1,92 @@
+environment: "local"
+
+backend:
+  securityContext:
+    readOnlyRootFilesystem: false
+    runAsNonRoot: false
+    runAsUser: 0
+
+  adminUrlScheme: http
+  auth0:
+    audience: http://scaffold.localhost:8443
+    callbackURL: http://scaffold.localhost:8443/callback
+    clientID: NOTREAL
+    clientSecret: NOTREAL
+    domain: ""
+    logoutURL: http://scaffold.localhost:8443
+
+  datadog:
+    dd_trace_enabled: false
+    dd_logs_injection: false
+    dd_profiling_enabled: false
+
+  db:
+    seed: true
+    uri: postgresql://admin:admin@scaffold-postgresql:5432/db
+
+  domain: scaffold.localhost
+  secretKey: LOCALSECRETKEY
+
+  image:
+    repository: scaffold/backend
+
+  swagger:
+    url: scaffold.localhost:8443
+
+flower:
+  datadog:
+    dd_trace_enabled: false
+    dd_logs_injection: false
+    dd_profiling_enabled: false
+
+rabbitmq:
+  auth:
+    username: admin
+    password: rabbitpass
+  enabled: true
+
+postgresql:
+  enabled: true
+  postgresqlUsername: admin
+  postgresqlPassword: admin
+  postgresqlDatabase: db
+  persistence:
+    enabled: false
+  image:
+    tag: 12.7.0
+
+
+# This traefik is only for local devel
+traefik:
+  enabled: true
+  dashboard:
+    enabled: true
+    domain: dashboard.localhost
+  deployment:
+    enabled: true
+  logs:
+    general:
+      level: INFO
+  ingressRoute:
+    dashboard:
+      enabled: false
+      use_auth: false
+  ports:
+    web:
+      port: 8000
+    websecure:
+      port: 8443
+  additionalArguments:
+    - "--entrypoints.web.address=:8000"
+    - "--entrypoints.websecure.address=:8443"
+    - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+    - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+ui:
+  securityContext:
+    readOnlyRootFilesystem: false
+    runAsNonRoot: false
+    runAsUser: 0
+  
+  image:
+    repository: scaffold/ui
+    tag: latest

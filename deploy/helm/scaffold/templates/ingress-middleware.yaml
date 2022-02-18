@@ -1,0 +1,20 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Release.Name }}-cors-header
+spec:
+  headers:
+    accessControlAllowMethods:
+      - "GET"
+      - "OPTIONS"
+      - "PATCH"
+      - "POST"
+      - "DELETE"
+    accessControlAllowHeaders:
+      - "accept"
+      - "authorization"
+    accessControlAllowOriginList:
+      - "*"
+    accessControlMaxAge: 100
+    addVaryHeader: true
+
