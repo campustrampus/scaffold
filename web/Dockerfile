@@ -16,7 +16,6 @@ WORKDIR /app
 
 COPY ["package.json", "yarn.lock", "./"]
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN yarn install
 
 EXPOSE 3000
